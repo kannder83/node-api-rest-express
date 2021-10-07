@@ -1,5 +1,5 @@
 const express = require('express');
-
+const routerApi = require('./routes');
 const app = express();
 
 const PORT = 3000;
@@ -8,26 +8,16 @@ app.get('/', (req, res) => {
   res.send('Hola mi server en express!');
 });
 
-app.get('/products', (req, res) => {
-  res.json([
-    {
-      name: 'Product 1',
-      price: 1000,
-    },
-    {
-      name: 'Product 2',
-      price: 3000,
-    },
-  ]);
-});
-
-app.get('/products/:id', (req, res) => {
-  const { id } = req.params;
-  res.json({
-    id,
-    name: 'Product 2',
-    price: 2000,
-  });
+app.get('/users', (req, res) => {
+  const { limit, offset } = req.query;
+  if (limit && offset) {
+    res.json({
+      limit,
+      offset,
+    });
+  } else {
+    res.send('No hay parametros.');
+  }
 });
 
 app.get('/categories/:categoryId/products/:productId', (req, res) => {
@@ -40,6 +30,8 @@ app.get('/categories/:categoryId/products/:productId', (req, res) => {
     description: 'sport',
   });
 });
+
+routerApi(app);
 
 app.listen(PORT, () => {
   console.log(`Running in http://localhost:${PORT}`);
