@@ -1,33 +1,40 @@
 const express = require('express');
-const faker = require('faker');
+
+const ProductsService = require('../services/product.service');
 
 const router = express.Router();
 
-router.get('/filter', (req, res) => {
-  res.send('Soy un filtro');
-});
+//Se crea la instancia del servicio:
+const service = new ProductsService();
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   const { id } = req.params;
-  res.json({
-    id,
-    name: 'Product 1',
-    price: 3000,
-  });
+  const products = await service.findOne(id);
+  res.json(products);
 });
 
-router.get('/', (req, res) => {
-  const { size } = req.query;
-  const products = [];
-  const limit = size || 10;
-  for (let index = 0; index < limit; index++) {
-    products.push({
-      name: faker.commerce.productName(),
-      price: parseInt(faker.commerce.price(), 10),
-      image: faker.image.imageUrl(),
-    });
-  }
+router.get('/', async (req, res) => {
+  const products = await service.find();
   res.json(products);
+});
+
+router.post('/', async (req, res) => {
+  const body = req.body;
+  const newProduct = await service.create(body);
+  res.status(201).json(newProduct);
+});
+
+router.patch('/:id', async (req, res) => {
+  const { id } = req.params;
+  const body = req.body;
+  const product = await service.update(id, body);
+  res.json(product);
+});
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  const rta = await service.delete(id);
+  res.json(rta);
 });
 
 module.exports = router;
